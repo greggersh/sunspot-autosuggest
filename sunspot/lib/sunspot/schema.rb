@@ -23,7 +23,9 @@ module Sunspot
       FieldType.new('slong', 'SortableLong', 'l'),
       FieldType.new('tint', 'TrieInteger', 'it'),
       FieldType.new('tfloat', 'TrieFloat', 'ft'),
-      FieldType.new('tdate', 'TrieInt', 'dt')
+      FieldType.new('tdate', 'TrieInt', 'dt'),
+	  FieldType.new('autocomplete', 'Autocomplete', 'ac'),
+	  FieldType.new('autocomplete', 'Autosuggest', 'as')
 
     ]
 

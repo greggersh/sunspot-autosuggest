@@ -109,6 +109,38 @@ module Sunspot
         true
       end
     end
+	
+	# Autocompletion type. Fields that are indexed using this type can be queried for autocompletion later
+	# Autocompletion is querying for "q*"
+    class AutocompleteType < AbstractType
+      def indexed_name(name) #:nodoc:
+        "#{name}_ac"
+      end
+
+      def to_indexed(value) #:nodoc:
+        value.to_s if value
+      end
+
+      def cast(string) #:nodoc:
+        string
+      end
+    end
+    
+    # Autosuggestion type. Fields that are indexed using this type can be queried for autosuggestion later
+	# Autosuggestion is querying for "* q*"
+    class AutosuggestType < AbstractType
+      def indexed_name(name) #:nodoc:
+        "#{name}_as"
+      end
+
+      def to_indexed(value) #:nodoc:
+        value.to_s if value
+      end
+
+      def cast(string) #:nodoc:
+        string
+      end
+    end
 
     # 
     # The String type represents string data.

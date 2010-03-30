@@ -9,6 +9,22 @@ types: !omap
         - LowerCaseFilterFactory
       invariants:
         multiValued: true
+  - autocomplete:
+      class: AutocompleteField
+      suffix: ac
+      omit_norms: false
+      tokenizer: KeywordTokenizerFactory
+      filters:
+        - LowerCaseFilterFactory
+        - EdgeNGramFilterFactory
+  - autosuggest:
+      class: AutosuggestField
+      suffix: as
+      omit_norms: false
+      tokenizer: LetterTokenizerFactory
+      filters:
+        - LowerCaseFilterFactory
+        - EdgeNGramFilterFactory
   - boolean:
       class: BoolField
       suffix: b
