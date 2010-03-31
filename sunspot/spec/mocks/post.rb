@@ -13,6 +13,14 @@ class Post < SuperClass
   def custom_string
     @custom_string ||= {}
   end
+  
+  def custom_autocomplete
+    @custom_autocomplete ||= {}
+  end
+  
+  def custom_autosuggest
+    @custom_autosuggest ||= {}
+  end
 
   def custom_fl
     @custom_fl ||= {}
@@ -27,7 +35,7 @@ class Post < SuperClass
   end
 
   private
-  attr_writer :category_ids, :custom_string, :custom_fl, :custom_time, :custom_boolean
+  attr_writer :category_ids, :custom_string, :custom_fl, :custom_time, :custom_boolean, :custom_autosuggest, :custom_autocomplete
 end
 
 Sunspot.setup(Post) do
@@ -54,6 +62,9 @@ Sunspot.setup(Post) do
     Time.now
   end
   coordinates :coordinates
+  
+  autocomplete :custom_autocomplete
+  autosuggest :custom_autosuggest
 
   dynamic_string :custom_string, :stored => true
   dynamic_float :custom_float, :multiple => true, :using => :custom_fl

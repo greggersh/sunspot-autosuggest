@@ -5,6 +5,16 @@ describe 'indexing dynamic fields' do
     session.index(post(:custom_string => { :test => 'string' }))
     connection.should have_add_with(:"custom_string:test_ss" => 'string')
   end
+  
+  it 'indexes autocomplete data' do
+    session.index(post(:custom_autocomplete => 'autocomplete text' ))
+    connection.should have_add_with(:"custom_autocomplete_ac" => 'autocomplete text')
+  end
+  
+  it 'indexes autosuggest data' do
+    session.index(post(:custom_autosuggest => 'autosuggest text' ))
+    connection.should have_add_with(:"custom_autosuggest_as" => 'autosuggest text')
+  end
 
   it 'indexes integer data with virtual accessor' do
     session.index(post(:category_ids => [1, 2]))
