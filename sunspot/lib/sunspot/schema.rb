@@ -25,7 +25,7 @@ module Sunspot
       FieldType.new('tfloat', 'TrieFloat', 'ft'),
       FieldType.new('tdate', 'TrieInt', 'dt'),
 	    FieldType.new('autocomplete', 'Autocomplete', 'ac'),
-	    FieldType.new('autocomplete', 'Autosuggest', 'as')
+	    FieldType.new('autosuggest', 'Autosuggest', 'as')
     ]
 
     FIELD_VARIANTS = [
