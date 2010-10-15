@@ -48,18 +48,30 @@ module Sunspot #:nodoc:
       # String:: host name
       #
       def hostname
-        @hostname ||= (user_configuration_from_key('solr', 'hostname') || 'localhost')
+        unless defined?(@hostname)
+          @hostname   = solr_url.host if solr_url
+          @hostname ||= user_configuration_from_key('solr', 'hostname')
+          @hostname ||= default_hostname
+        end
+        @hostname
       end
-
+      
       #
-      # The port at which to connect to Solr. Default 8983.
+      # The port at which to connect to Solr.
+      # Defaults to 8981 in test, 8982 in development and 8983 in production.
       #
       # ==== Returns
       #
       # Integer:: port
       #
       def port
-        @port ||= (user_configuration_from_key('solr', 'port') || 8983).to_i
+        unless defined?(@port)
+          @port   = solr_url.port if solr_url
+          @port ||= user_configuration_from_key('solr', 'port')
+          @port ||= default_port
+          @port   = @port.to_i
+        end
+        @port
       end
 
       #
@@ -71,7 +83,12 @@ module Sunspot #:nodoc:
       # String:: path
       #
       def path
-        @path ||= (user_configuration_from_key('solr', 'path') || '/solr')
+        unless defined?(@path)
+          @path   = solr_url.path if solr_url
+          @path ||= user_configuration_from_key('solr', 'path')
+          @path ||= default_path
+        end
+        @path
       end
 
       #
@@ -245,7 +262,7 @@ module Sunspot #:nodoc:
           hash[key] if hash
         end
       end
-
+      
       #
       # Memoized hash of configuration options for the current Rails environment
       # as specified in config/sunspot.yml
@@ -267,6 +284,36 @@ module Sunspot #:nodoc:
             end
           end
       end
+    
+    protected
+    
+      #
+      # When a specific hostname, port and path aren't provided in the
+      # sunspot.yml file, look for a key named 'url', then check the
+      # environment, then fall back to a sensible localhost default.
+      #
+      
+      def solr_url
+        if ENV['SOLR_URL'] || ENV['WEBSOLR_URL']
+          URI.parse(ENV['SOLR_URL'] || ENV['WEBSOLR_URL'])
+        end
+      end
+      
+      def default_hostname
+        'localhost'
+      end
+      
+      def default_port
+        { 'test'        => 8981,
+          'development' => 8982,
+          'production'  => 8983
+        }[::Rails.env]  || 8983
+      end
+      
+      def default_path
+        '/solr'
+      end
+      
     end
   end
 end

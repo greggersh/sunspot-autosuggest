@@ -70,8 +70,8 @@ shared_examples_for 'fulltext query' do
       subqueries(:q).last[:qf].split(' ').sort.should == %w(backwards_title_text body_textsv tags_textv title_text)
     end
 
-    it 'puts automatic dismax parameters in subquery' do
-      subqueries(:q).each { |subquery| subquery[:fl].should == '* score' }
+    it 'puts field list in main query' do
+      connection.should have_last_search_with(:fl => '* score')
     end
   end
 
@@ -243,7 +243,7 @@ shared_examples_for 'fulltext query' do
     connection.should have_last_search_with(
       :bq => [
         'average_rating_ft:[2\.0 TO *]^2.0',
-        'featured_b:true^1.5'
+        'featured_bs:true^1.5'
       ]
     )
   end

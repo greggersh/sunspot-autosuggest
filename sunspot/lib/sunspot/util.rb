@@ -100,10 +100,25 @@ module Sunspot
       # as I know the behavior of Kernel.Array() is otherwise fine.
       #
       def Array(object)
-        if object.is_a?(String)
+        case object
+        when String, Hash
           [object]
         else
           super
+        end
+      end
+
+      # 
+      # When generating boosts, Solr requires that the values be in standard
+      # (not scientific) notation. We would like to ensure a minimum number of
+      # significant digits (i.e., digits that are not prefix zeros) for small
+      # float values.
+      #
+      def format_float(f, digits)
+        if f < 1
+          sprintf('%.*f', digits - Math.log10(f), f)
+        else
+          f.to_s
         end
       end
 
@@ -181,35 +196,7 @@ module Sunspot
       end
     end
 
-    class Coordinates #:nodoc:
-      def initialize(coords)
-        @coords = coords
-      end
-
-      def lat
-        if @coords.respond_to?(:first)
-          @coords.first
-        elsif @coords.respond_to?(:lat)
-          @coords.lat
-        else
-          @coords.latitude
-        end.to_f
-      end
-
-      def lng
-        if @coords.respond_to?(:last)
-          @coords.last
-        elsif @coords.respond_to?(:lng)
-          @coords.lng
-        elsif @coords.respond_to?(:lon)
-          @coords.lon
-        elsif @coords.respond_to?(:long)
-          @coords.long
-        elsif @coords.respond_to?(:longitude)
-          @coords.longitude
-        end.to_f
-      end
-    end
+    Coordinates = Struct.new(:lat, :lng)
 
     class ContextBoundDelegate
       class <<self

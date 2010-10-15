@@ -1,4 +1,5 @@
 require File.join(File.dirname(__FILE__), 'spec_helper')
+require 'bigdecimal'
 
 describe 'indexing attribute fields', :type => :indexer do
   it 'should correctly index a stored string attribute field' do
@@ -72,41 +73,29 @@ describe 'indexing attribute fields', :type => :indexer do
 
   it 'should correctly index a boolean field' do
     session.index(post(:featured => true))
-    connection.should have_add_with(:featured_b => 'true')
+    connection.should have_add_with(:featured_bs => 'true')
   end
 
   it 'should correctly index a false boolean field' do
     session.index(post(:featured => false))
-    connection.should have_add_with(:featured_b => 'false')
+    connection.should have_add_with(:featured_bs => 'false')
   end
 
   it 'should not index a nil boolean field' do
     session.index(post)
-    connection.should_not have_add_with(:featured_b)
+    connection.should_not have_add_with(:featured_bs)
   end
 
   it 'should index latitude and longitude as a pair' do
-    session.index(post(:coordinates => [40.7, -73.5]))
-    connection.should have_add_with(:lat => 40.7, :lng => -73.5)
+    session.index(post(:coordinates => Sunspot::Util::Coordinates.new(40.7, -73.5)))
+    connection.should have_add_with(:coordinates_s => 'dr5xx3nytvgs')
   end
 
-  [
-    [:lat, :lng],
-    [:lat, :lon],
-    [:lat, :long],
-    [:latitude, :longitude]
-  ].each do |lat_attr, lng_attr|
-    it "should index latitude and longitude from #{lat_attr.inspect}, #{lng_attr.inspect}" do
-      session.index(post(
-          :coordinates => OpenStruct.new(lat_attr => 40.7, lng_attr => -73.5)
-      ))
-      connection.should have_add_with(:lat => 40.7, :lng => -73.5)
-    end
-  end
-
-  it 'should index latitude and longitude from a block' do
-    session.index(Photo.new(:lat => 30, :lng => -60))
-    connection.should have_add_with(:lat => 30.0, :lng => -60.0)
+  it 'should index latitude and longitude passed as non-Floats' do
+    coordinates = Sunspot::Util::Coordinates.new(
+      BigDecimal.new('40.7'), BigDecimal.new('-73.5'))
+    session.index(post(:coordinates => coordinates))
+    connection.should have_add_with(:coordinates_s => 'dr5xx3nytvgs')
   end
 
   it 'should correctly index an attribute field with block access' do
@@ -145,5 +134,10 @@ describe 'indexing attribute fields', :type => :indexer do
     lambda do
       Sunspot.setup(Post) { integer :popularity, :more_like_this => true }
     end.should raise_error(ArgumentError)
+  end
+  
+  it 'should use a specified field name when the :as option is set' do
+    session.index(post(:title => 'A Title'))
+    connection.should have_add_with(:legacy_field_s => 'legacy A Title')
   end
 end

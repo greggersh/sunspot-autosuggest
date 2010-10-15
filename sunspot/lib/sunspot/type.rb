@@ -1,3 +1,10 @@
+require 'singleton'
+begin
+  require 'geohash'
+rescue LoadError => e
+  require 'pr_geohash'
+end
+
 module Sunspot
   # 
   # This module contains singleton objects that represent the types that can be
@@ -58,12 +65,7 @@ module Sunspot
     end
 
     class AbstractType #:nodoc:
-      class <<self
-        def instance
-          @instance ||= new
-        end
-        private :new
-      end
+      include Singleton
 
       def accepts_dynamic?
         true
@@ -349,10 +351,40 @@ module Sunspot
           true
         when 'false'
           false
+        when true, false
+          string
         end
       end
     end
     register BooleanType, TrueClass, FalseClass
+
+    # 
+    # The Location type encodes geographical coordinates as a GeoHash.
+    # The data for this type must respond to the `lat` and `lng` methods; you
+    # can use Sunspot::Util::Coordinates as a wrapper if your source data does
+    # not follow this API.
+    #
+    # Location fields are most usefully searched using the
+    # Sunspot::DSL::RestrictionWithType#near method; see that method for more
+    # information on geographical search.
+    #
+    # ==== Example
+    #
+    #   Sunspot.setup(Post) do
+    #     location :coordinates do
+    #       Sunspot::Util::Coordinates.new(coordinates[0], coordinates[1])
+    #     end
+    #   end
+    #
+    class LocationType < AbstractType
+      def indexed_name(name)
+        "#{name}_s"
+      end
+
+      def to_indexed(value)
+        GeoHash.encode(value.lat.to_f, value.lng.to_f, 12)
+      end
+    end
 
     class ClassType < AbstractType
       def indexed_name(name) #:nodoc:

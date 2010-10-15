@@ -51,7 +51,7 @@ Sunspot.setup(Post) do
   float :average_rating, :using => :ratings_average, :trie => true
   time :published_at, :trie => true
   date :expire_date
-  boolean :featured, :using => :featured?
+  boolean :featured, :using => :featured?, :stored => true
   string :sort_title do
     title.downcase.sub(/^(a|an|the)\W+/, '') if title
   end
@@ -61,8 +61,7 @@ Sunspot.setup(Post) do
   time :last_indexed_at, :stored => true do
     Time.now
   end
-  coordinates :coordinates
-  
+  location :coordinates
   autocomplete :custom_autocomplete
   autosuggest :custom_autosuggest
 
@@ -80,6 +79,10 @@ Sunspot.setup(Post) do
     if ratings_average
       1 + (ratings_average - 3.0) / 4.0
     end
+  end
+  
+  string :legacy, :as => :legacy_field_s do
+    "legacy #{title}"
   end
 end
 

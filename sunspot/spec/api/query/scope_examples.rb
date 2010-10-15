@@ -39,7 +39,7 @@ shared_examples_for "scoped query" do
     search do
       with :featured, false
     end
-    connection.should have_last_search_including(:fq, 'featured_b:false')
+    connection.should have_last_search_including(:fq, 'featured_bs:false')
   end
 
   it 'scopes by less than match with float' do
@@ -75,13 +75,6 @@ shared_examples_for "scoped query" do
       with(:average_rating).between 2.0..4.0
     end
     connection.should have_last_search_including(:fq, 'average_rating_ft:[2\.0 TO 4\.0]')
-  end
-
-  it 'automatically sorts ranges in between matches' do
-    search do
-      with(:blog_id).between(4..2)
-    end
-    connection.should have_last_search_including(:fq, 'blog_id_i:[2 TO 4]')
   end
 
   it 'scopes by any match with integer' do
@@ -175,12 +168,40 @@ shared_examples_for "scoped query" do
     connection.should have_last_search_including(:fq, 'average_rating_ft:[* TO *]')
   end
 
+  it 'includes by object identity' do
+    post = Post.new
+    search do
+      with post
+    end
+    connection.should have_last_search_including(:fq, "id:(Post\\ #{post.id})")
+  end
+
+  it 'includes multiple objects passed as varargs by object identity' do
+    post1, post2 = Post.new, Post.new
+    search do
+      with post1, post2
+    end
+    connection.should have_last_search_including(
+      :fq, "id:(Post\\ #{post1.id} OR Post\\ #{post2.id})"
+    )
+  end
+
+  it 'includes multiple objects passed as array by object identity' do
+    posts = [Post.new, Post.new]
+    search do
+      with posts
+    end
+    connection.should have_last_search_including(
+      :fq, "id:(Post\\ #{posts.first.id} OR Post\\ #{posts.last.id})"
+    )
+  end
+
   it 'excludes by object identity' do
     post = Post.new
     search do
       without post
     end
-    connection.should have_last_search_including(:fq, "-id:Post\\ #{post.id}")
+    connection.should have_last_search_including(:fq, "-id:(Post\\ #{post.id})")
   end
 
   it 'excludes multiple objects passed as varargs by object identity' do
@@ -190,8 +211,7 @@ shared_examples_for "scoped query" do
     end
     connection.should have_last_search_including(
       :fq,
-      "-id:Post\\ #{post1.id}",
-      "-id:Post\\ #{post2.id}"
+      "-id:(Post\\ #{post1.id} OR Post\\ #{post2.id})"
     )
   end
 
@@ -202,8 +222,7 @@ shared_examples_for "scoped query" do
     end
     connection.should have_last_search_including(
       :fq,
-      "-id:Post\\ #{posts.first.id}",
-      "-id:Post\\ #{posts.last.id}"
+      "-id:(Post\\ #{posts.first.id} OR Post\\ #{posts.last.id})"
     )
   end
 

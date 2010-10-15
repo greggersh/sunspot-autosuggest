@@ -63,7 +63,7 @@ field name patterns defined in the packaged <code>schema.xml</code>, so those
 cannot be modified.
 
 You can also run your own instance of Solr wherever you'd like; just copy the solr/config/schema.xml file out of the gem's solr into your installation.
-You can change the URL at which Sunspot accesses Solr with:
+You can change the URL at which Sunspot accesses Solr by setting <code>SOLR_URL</code> in your application's environment, or assigning it to Sunspot's configuration directly:
 
   Sunspot.config.solr.url = 'http://solr.my.host:9818/solr'
 
@@ -208,14 +208,20 @@ Sunspot repository at `upstream`:
 * {Sunspot Full-text Search for Rails/Ruby}[http://therailworld.com/posts/23-Sunspot-Full-text-Search-for-Rails-Ruby] (The Rail World)
 * {A Few Sunspot Tips}[http://blog.trydionel.com/2009/11/19/a-few-sunspot-tips/] (spiral_code)
 * {Sunspot: A Solr-Powered Search Engine for Ruby}[http://www.linux-mag.com/id/7341] (Linux Magazine)
+* {Sunspot Showed Me the Light}[http://bennyfreshness.com/2010/05/sunspot-helped-me-see-the-light/] (ben koonse)
+* {rails3 + heroku + sunspot : madness}[http://anhaminha.tumblr.com/post/632682537/rails3-heroku-sunspot-madness] (anhaminha)
+* {How to get full text search working with Sunspot}[http://cookbook.hobocentral.net/recipes/57-how-to-get-full-text-search] (Hobo Cookbook)
 * {Using Sunspot for Free-Text Search with Redis}[http://masonoise.wordpress.com/2010/02/06/using-sunspot-for-free-text-search-with-redis/] (While I Pondered...)
+* {Fuzzy searching in SOLR with Sunspot}[http://www.pipetodevnull.com/past/2010/8/5/fuzzy_searching_in_solr_with_sunspot/] (pipe :to => /dev/null)
 * {Default scope with Sunspot}[http://www.cloudspace.com/blog/2010/01/15/default-scope-with-sunspot/] (Cloudspace)
 * {Chef recipe for Sunspot in production}[http://gist.github.com/336403]
+* {Cucumber and Sunspot}[http://opensoul.org/2010/4/7/cucumber-and-sunspot] (opensoul.org)
 * {Testing Sunspot with Cucumber}[http://blog.trydionel.com/2010/02/06/testing-sunspot-with-cucumber/] (spiral_code)
 * {Running cucumber features with sunspot_rails}[http://blog.kabisa.nl/2010/02/03/running-cucumber-features-with-sunspot_rails] (Kabisa Blog)
 * {How To Use Twitter Lists to Determine Influence}[http://www.untitledstartup.com/2010/01/how-to-use-twitter-lists-to-determine-influence/] (Untitled Startup)
 * {Sunspot Quickstart}[http://wiki.websolr.com/index.php/Sunspot_Quickstart] (WebSolr)
 * {Solr, and Sunspot}[http://www.kuahyeow.com/2009/08/solr-and-sunspot.html] (YT!)
+* {The Saga of the Switch}[http://mrb.github.com/2010/04/08/the-saga-of-the-switch.html] (mrb -- includes comparison of Sunspot and Ultrasphinx)
 
 == Contributors
 
@@ -233,6 +239,8 @@ Sunspot repository at `upstream`:
 * Kieran Topping
 * Nicolas Braem (nicolas.braem@gmail.com)
 * Jeremy Ashkenas (jashkenas@gmail.com)
+* Dylan Vaughn (dylanvaughn@yahoo.com)
+* Brian Durand (brian@embellishedvisions.com)
 
 == License
 

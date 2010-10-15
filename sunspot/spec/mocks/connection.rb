@@ -22,14 +22,15 @@ module Mock
   end
 
   class Connection
-    attr_reader :adds, :commits, :searches, :message, :opts, :deletes_by_query
+    attr_reader :adds, :commits, :optims, :searches, :message, :opts, :deletes_by_query
     attr_accessor :response
     attr_writer :expected_handler
+    undef_method :select # annoyingly defined on Object
 
     def initialize(opts = {})
       @opts = opts
       @message = OpenStruct.new
-      @adds, @deletes, @deletes_by_query, @commits, @searches = Array.new(5) { [] }
+      @adds, @deletes, @deletes_by_query, @commits, @optims, @searches = Array.new(6) { [] }
       @expected_handler = :select
     end
 
@@ -49,13 +50,20 @@ module Mock
       @commits << Time.now
     end
 
-    def method_missing(method, *args, &block)
-      if method.to_sym == @expected_handler
-        @searches << @last_search = args.first
-        @response || {}
-      else
-        super
+    def optimize
+      @optims << Time.now
+    end
+
+    def request(path, params)
+      unless path == "/#{@expected_handler}"
+        raise ArgumentError, "Expected request to #{@expected_handler} request handler"
       end
+      @searches << @last_search = params
+      @response || {}
+    end
+
+    def method_missing(method, *args, &block)
+      request("/#{method}", *args)
     end
 
     def has_add_with?(*documents)

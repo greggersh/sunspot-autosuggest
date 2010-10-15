@@ -28,6 +28,14 @@ module Sunspot
     NotSupportedError = Class.new(StandardError)
 
     autoload(
+      :AbstractSessionProxy,
+      File.join(
+        File.dirname(__FILE__),
+        'session_proxy',
+        'abstract_session_proxy'
+      )
+    )
+    autoload(
       :ThreadLocalSessionProxy,
       File.join(
         File.dirname(__FILE__),
@@ -65,6 +73,14 @@ module Sunspot
         File.dirname(__FILE__),
         'session_proxy',
         'id_sharding_session_proxy'
+      )
+    )
+    autoload(
+      :SilentFailSessionProxy,
+      File.join(
+        File.dirname(__FILE__),
+        'session_proxy',
+        'silent_fail_session_proxy'
       )
     )
   end

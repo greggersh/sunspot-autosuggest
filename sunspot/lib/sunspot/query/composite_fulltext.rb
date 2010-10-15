@@ -9,15 +9,20 @@ module Sunspot
         @components << dismax = Dismax.new(keywords)
         dismax
       end
+      
+      def add_location(field, lat, lng, options)
+        @components << location = Geo.new(field, lat, lng, options)
+        location
+      end
 
       def to_params
         case @components.length
         when 0
           {}
         when 1
-          @components.first.to_params
+          @components.first.to_params.merge(:fl => '* score')
         else
-          to_subqueries
+          to_subqueries.merge(:fl => '* score')
         end
       end
 

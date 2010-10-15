@@ -128,7 +128,7 @@ describe 'faceting', :type => :search do
   end
 
   it 'returns boolean facet' do
-    stub_facet(:featured_b, 'true' => 3, 'false' => 1)
+    stub_facet(:featured_bs, 'true' => 3, 'false' => 1)
     result = session.search(Post) { facet(:featured) }
     facet_values(result, :featured).should == [true, false]
   end
@@ -265,6 +265,10 @@ describe 'faceting', :type => :search do
 
     it 'limits facets if limit option is given' do
       facet_values_from_options(:limit => 1).should == [2]
+    end
+
+    it 'does not limit facets if limit option is negative' do
+      facet_values_from_options(:limit => -2).should == [1, 3, 2]
     end
 
     it 'returns all facets if limit greater than number of facets' do

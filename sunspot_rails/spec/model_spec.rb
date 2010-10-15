@@ -115,15 +115,8 @@ describe 'ActiveRecord mixin' do
       end.results.should be_empty
     end
     
-    it 'should find ActiveRecord objects with an integer, not a string' do
-      Post.should_receive(:all).with(hash_including(:conditions => { "id" => [@post.id.to_i] })).and_return([@post])
-      Post.search do
-        with :title, 'Test Post'
-      end.results.should == [@post]
-    end
-    
     it 'should use the include option on the data accessor when specified' do
-      Post.should_receive(:find).with(anything(), hash_including(:include => [:blog])).and_return([@post])
+      Post.should_receive(:all).with(hash_including(:include => [:blog])).and_return([@post])
       Post.search do
         with :title, 'Test Post'
         data_accessor_for(Post).include = [:blog]
@@ -131,14 +124,14 @@ describe 'ActiveRecord mixin' do
     end
 
     it 'should pass :include option from search call to data accessor' do
-      Post.should_receive(:find).with(anything(), hash_including(:include => [:blog])).and_return([@post])
+      Post.should_receive(:all).with(hash_including(:include => [:blog])).and_return([@post])
       Post.search(:include => [:blog]) do
         with :title, 'Test Post'
       end.results.should == [@post]
     end
     
     it 'should use the select option from search call to data accessor' do
-      Post.should_receive(:find).with(anything(), hash_including(:select => 'title, published_at')).and_return([@post])
+      Post.should_receive(:all).with(hash_including(:select => 'title, published_at')).and_return([@post])
       Post.search(:select => 'title, published_at') do
         with :title, 'Test Post'
       end.results.should == [@post]
@@ -149,7 +142,7 @@ describe 'ActiveRecord mixin' do
     end
     
     it 'should use the select option on the data accessor when specified' do
-      Post.should_receive(:find).with(anything(), hash_including(:select => 'title, published_at')).and_return([@post])
+      Post.should_receive(:all).with(hash_including(:select => 'title, published_at')).and_return([@post])
       Post.search do
         with :title, 'Test Post'
         data_accessor_for(Post).select = [:title, :published_at]
@@ -157,7 +150,7 @@ describe 'ActiveRecord mixin' do
     end
     
     it 'should not use the select option on the data accessor when not specified' do
-      Post.should_receive(:find).with(anything(), hash_not_including(:select)).and_return([@post])
+      Post.should_receive(:all).with(hash_not_including(:select)).and_return([@post])
       Post.search do
         with :title, 'Test Post'
       end.results.should == [@post]
@@ -177,7 +170,7 @@ describe 'ActiveRecord mixin' do
       post.location = Location.create!(:lat => 40.0, :lng => -70.0)
       post.save
       post.index!
-      Post.search { near([40.0, -70.0], :distance => 1) }.results.should == [post]
+      Post.search { with(:location).near(40.0, -70.0) }.results.should == [post]
     end
 
   end
@@ -309,7 +302,7 @@ describe 'ActiveRecord mixin' do
           params[:limit].should == 500
           params[:include].should == []
           params[:conditions].should == ['posts.id > ?', 0]
-          params[:order].should == 'id'
+          params[:order].should == 'posts.id'
         end.and_return(@posts)
         Post.reindex
       end
@@ -318,7 +311,7 @@ describe 'ActiveRecord mixin' do
         @posts = Array.new(10) { Author.create }
         Author.should_receive(:all).with do |params|
           params[:conditions].should == ['writers.writer_id > ?', 0]
-          params[:order].should == 'writer_id'
+          params[:order].should == 'writers.writer_id'
         end.and_return(@posts)
         Author.reindex
       end
@@ -347,7 +340,7 @@ describe 'ActiveRecord mixin' do
       it "should set the include option from the searchable options" do
         @blogs = Array.new(10) { Blog.create }
         Blog.should_receive(:all).with do |params|
-          params[:include].should == [:posts, :comments]
+          params[:include].should == [{ :posts => :author }, :comments]
           @blogs
         end.and_return(@blogs)
         Blog.reindex
