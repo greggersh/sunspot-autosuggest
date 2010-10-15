@@ -3,7 +3,6 @@ require File.join(File.dirname(__FILE__), 'rails', 'configuration')
 require File.join(File.dirname(__FILE__), 'rails', 'adapters')
 require File.join(File.dirname(__FILE__), 'rails', 'request_lifecycle')
 require File.join(File.dirname(__FILE__), 'rails', 'searchable')
-require File.join(File.dirname(__FILE__), 'rails', 'autocomplete_view_helpers')
 
 module Sunspot #:nodoc:
   module Rails #:nodoc:
