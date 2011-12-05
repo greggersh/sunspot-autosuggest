@@ -1,3 +1,5 @@
+require 'erb'
+
 module Sunspot #:nodoc:
   module Rails #:nodoc:
     #
@@ -12,6 +14,8 @@ module Sunspot #:nodoc:
     #       min_memory: 512M
     #       max_memory: 1G
     #       solr_jar: /some/path/solr15/start.jar
+    #       bind_address: 0.0.0.0
+    #     disabled: false
     #   test:
     #     solr:
     #       hostname: localhost
@@ -193,9 +197,10 @@ module Sunspot #:nodoc:
         @data_path ||= user_configuration_from_key('solr', 'data_path') || File.join(::Rails.root, 'solr', 'data', ::Rails.env)
       end
       
-      def pid_path
-        @pids_path ||= user_configuration_from_key('solr', 'pid_path') || File.join(::Rails.root, 'solr', 'pids', ::Rails.env)
+      def pid_dir
+        @pid_dir ||= user_configuration_from_key('solr', 'pid_dir') || File.join(::Rails.root, 'solr', 'pids', ::Rails.env)
       end
+
       
       # 
       # The solr home directory. Sunspot::Rails expects this directory
@@ -235,7 +240,22 @@ module Sunspot #:nodoc:
       def max_memory
         @max_memory ||= user_configuration_from_key('solr', 'max_memory')
       end
-      
+
+      #
+      # Interface on which to run Solr
+      #
+      def bind_address
+        @bind_address ||= user_configuration_from_key('solr', 'bind_address')
+      end
+
+      #
+      # Whether or not to disable Solr.
+      # Defaults to false.
+      #
+      def disabled?
+        @disabled ||= (user_configuration_from_key('disabled') || false)
+      end
+
       private
       
       #
@@ -277,7 +297,8 @@ module Sunspot #:nodoc:
             path = File.join(::Rails.root, 'config', 'sunspot.yml')
             if File.exist?(path)
               File.open(path) do |file|
-                YAML.load(file)[::Rails.env]
+                processed = ERB.new(file.read).result
+                YAML.load(processed)[::Rails.env]
               end
             else
               {}

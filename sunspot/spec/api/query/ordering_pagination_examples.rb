@@ -1,5 +1,3 @@
-require File.join(File.dirname(__FILE__), 'spec_helper')
-
 shared_examples_for 'sortable query' do
   it 'paginates using default per_page when page not provided' do
     search
@@ -25,6 +23,20 @@ shared_examples_for 'sortable query' do
       paginate :per_page => 15
     end
     connection.should have_last_search_with(:rows => 15, :start => 0)
+  end
+
+  it 'paginates with an offset' do
+    search do
+      paginate :per_page => 15, :offset => 3
+    end
+    connection.should have_last_search_with(:rows => 15, :start => 3)
+  end
+
+  it 'paginates with an offset as a string' do
+    search do
+      paginate :per_page => 15, :offset => '3'
+    end
+    connection.should have_last_search_with(:rows => 15, :start => 3)
   end
 
   it 'paginates from string argument' do
